@@ -2,48 +2,53 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
+    protected $table = 'usuarios';
+    protected $primaryKey = 'id_usuario';
+
     protected $fillable = [
-        'name',
-        'email',
-        'password',
+        'id_rol',
+        'nombre_completo',
+        'nombre_usuario',
+        'correo',
+        'contrasena',
+        'telefono',
+        'estado',
+        'intentos_fallidos',
+        'bloqueado_hasta',
+        'ultimo_acceso',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'contrasena',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'contrasena' => 'hashed',
+            'estado' => 'boolean',
+            'intentos_fallidos' => 'integer',
+            'bloqueado_hasta' => 'datetime',
+            'ultimo_acceso' => 'datetime',
         ];
+    }
+
+    public function getAuthPasswordName(): string
+    {
+        return 'contrasena';
+    }
+
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class, 'id_rol', 'id_rol');
     }
 }
