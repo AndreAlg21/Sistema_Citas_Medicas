@@ -26,7 +26,14 @@
         <section class="panel">
             <h2>Bienvenido, {{ auth()->user()->nombre_completo }}</h2>
             <p>Tu sesión está iniciada. Desde aquí se irán incorporando las funciones de gestión de citas médicas.</p>
-        </section>
+            <p>
+    <a href="{{ route('especialidades.index') }}">Gestionar especialidades</a>
+</p>
+            <p><a href="{{ route('medicos.index') }}">Gestionar médicos</a></p>        
+                    <p><a href="{{ route('horarios.index') }}">Gestionar horarios de atención</a></p>
+                        <p><a href="{{ route('pacientes.index') }}">Gestionar pacientes</a></p>
+            </section>
     </main>
 </body>
 </html>
+
