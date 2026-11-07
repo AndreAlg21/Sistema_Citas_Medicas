@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del usuario</title>
-</head>
-<body>
-    <h1>Datos del usuario</h1>
+@extends('layouts.app')
+@section('title', 'Detalle del usuario')
+@section('content')
+<h1>Datos del usuario</h1>
 
     <p><strong>Nombre:</strong> {{ $usuario->nombre_completo }}</p>
     <p><strong>Nombre de usuario:</strong> {{ $usuario->nombre_usuario }}</p>
@@ -30,5 +25,4 @@
         |
         <a href="{{ route('usuarios.index') }}">Volver a la lista</a>
     </p>
-</body>
-</html>
+@endsection

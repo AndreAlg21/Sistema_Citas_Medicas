@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle de especialidad</title>
-</head>
-<body>
-    <h1>Datos de la especialidad</h1>
+@extends('layouts.app')
+@section('title', 'Detalle de especialidad')
+@section('content')
+<h1>Datos de la especialidad</h1>
 
     <p><strong>ID:</strong> {{ $especialidad->id_especialidad }}</p>
     <p><strong>Nombre:</strong> {{ $especialidad->nombre }}</p>
@@ -18,5 +13,4 @@
         |
         <a href="{{ route('especialidades.index') }}">Volver a la lista</a>
     </p>
-</body>
-</html>
+@endsection

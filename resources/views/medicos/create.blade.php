@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar médico</title>
-</head>
-<body>
-    <h1>Registrar médico</h1>
+@extends('layouts.app')
+@section('title', 'Registrar médico')
+@section('content')
+<h1>Registrar médico</h1>
 
     @if ($errors->any())
         <ul>
@@ -99,5 +94,4 @@
         <button type="submit">Guardar médico</button>
         <a href="{{ route('medicos.index') }}">Cancelar</a>
     </form>
-</body>
-</html>
+@endsection

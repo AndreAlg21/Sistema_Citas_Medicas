@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Usuarios</title>
-</head>
-<body>
-    <h1>Gestión de usuarios</h1>
+@extends('layouts.app')
+@section('title', 'Usuarios')
+@section('content')
+<h1>Gestión de usuarios</h1>
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
@@ -77,5 +72,4 @@
 
         {{ $usuarios->links() }}
     @endif
-</body>
-</html>
+@endsection

@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detalle del rol</title>
-</head>
-<body>
-    <h1>Datos del rol</h1>
+@extends('layouts.app')
+@section('title', 'Detalle del rol')
+@section('content')
+<h1>Datos del rol</h1>
 
     <p><strong>Nombre:</strong> {{ $role->nombre }}</p>
     <p><strong>Descripción:</strong> {{ $role->descripcion ?? 'Sin descripción' }}</p>
@@ -32,5 +27,4 @@
         |
         <a href="{{ route('roles.index') }}">Volver a la lista</a>
     </p>
-</body>
-</html>
+@endsection

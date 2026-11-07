@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de roles</title>
-</head>
-<body>
-    <h1>Gestión de roles y permisos</h1>
+@extends('layouts.app')
+@section('title', 'Gestión de roles')
+@section('content')
+<h1>Gestión de roles y permisos</h1>
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
@@ -72,5 +67,4 @@
 
         {{ $roles->links() }}
     @endif
-</body>
-</html>
+@endsection

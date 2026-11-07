@@ -1,39 +1,35 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio | Clínica Vida Salud</title>
-    <style>
-        body { margin: 0; min-height: 100vh; background: #f1f5f9; color: #172033; font-family: Arial, sans-serif; }
-        header { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 5%; background: #087e8b; color: white; }
-        h1 { margin: 0; font-size: 20px; }
-        main { max-width: 900px; margin: 48px auto; padding: 0 24px; }
-        .panel { padding: 32px; border-radius: 14px; background: white; box-shadow: 0 12px 30px rgba(15, 23, 42, .08); }
-        button { padding: 10px 16px; border: 1px solid white; border-radius: 7px; background: transparent; color: white; cursor: pointer; }
-        p { color: #475569; line-height: 1.6; }
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Clínica Vida Salud</h1>
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button type="submit">Cerrar sesión</button>
-        </form>
-    </header>
-    <main>
-        <section class="panel">
-            <h2>Bienvenido, {{ auth()->user()->nombre_completo }}</h2>
-            <p>Tu sesión está iniciada. Desde aquí se irán incorporando las funciones de gestión de citas médicas.</p>
-            <p>
-    <a href="{{ route('especialidades.index') }}">Gestionar especialidades</a>
-</p>
-            <p><a href="{{ route('medicos.index') }}">Gestionar médicos</a></p>        
-                    <p><a href="{{ route('horarios.index') }}">Gestionar horarios de atención</a></p>
-                        <p><a href="{{ route('pacientes.index') }}">Gestionar pacientes</a></p>
-            </section>
-    </main>
-</body>
-</html>
-
+@extends('layouts.app')
+@section('title', 'Inicio')
+@section('content')
+@php($rol = auth()->user()->role?->nombre)
+<section class="welcome-panel">
+    <span class="eyebrow">Panel de trabajo · {{ $rol }}</span>
+    <h1>Hola, {{ auth()->user()->nombre_completo }}</h1>
+    <p class="muted">¿Qué necesitas gestionar hoy?</p>
+</section>
+<div class="dashboard-grid">
+    @if ($rol === 'Administrador')
+        <a class="action-card" href="{{ route('usuarios.index') }}"><span>♙</span><strong>Usuarios</strong><small>Cuentas y accesos</small></a>
+        <a class="action-card" href="{{ route('roles.index') }}"><span>⚙</span><strong>Roles y permisos</strong><small>Configura accesos</small></a>
+        <a class="action-card" href="{{ route('especialidades.index') }}"><span>✳</span><strong>Especialidades</strong><small>Servicios médicos</small></a>
+        <a class="action-card" href="{{ route('medicos.index') }}"><span>✚</span><strong>Médicos</strong><small>Perfiles profesionales</small></a>
+        <a class="action-card" href="{{ route('horarios.index') }}"><span>◷</span><strong>Horarios</strong><small>Jornadas por especialidad</small></a>
+        <a class="action-card" href="{{ route('pacientes.index') }}"><span>♙</span><strong>Pacientes</strong><small>Fichas e historial</small></a>
+        <a class="action-card" href="{{ route('citas.agenda') }}"><span>▦</span><strong>Agenda de citas</strong><small>Consulta la jornada</small></a>
+        <a class="action-card" href="{{ route('reportes.index') }}"><span>▤</span><strong>Reportes</strong><small>Resumen de actividad</small></a>
+    @elseif ($rol === 'Recepcionista')
+        <a class="action-card" href="{{ route('citas.disponibilidad') }}"><span>◷</span><strong>Disponibilidad</strong><small>Busca un turno libre</small></a>
+        <a class="action-card" href="{{ route('citas.create') }}"><span>＋</span><strong>Registrar cita</strong><small>Busca al paciente por carnet</small></a>
+        <a class="action-card" href="{{ route('citas.agenda') }}"><span>▦</span><strong>Agenda</strong><small>Consulta las citas del día</small></a>
+        <a class="action-card" href="{{ route('pacientes.index') }}"><span>♙</span><strong>Pacientes</strong><small>Fichas e historial</small></a>
+        <a class="action-card" href="{{ route('reportes.index') }}"><span>▤</span><strong>Reportes</strong><small>Resumen de citas</small></a>
+    @elseif ($rol === 'Medico')
+        <a class="action-card" href="{{ route('citas.agenda') }}"><span>▦</span><strong>Mi agenda</strong><small>Consulta tus próximas citas</small></a>
+    @elseif ($rol === 'Paciente')
+        <a class="action-card" href="{{ route('citas.disponibilidad') }}"><span>◷</span><strong>Reservar cita</strong><small>Busca un horario disponible</small></a>
+        <a class="action-card" href="{{ route('portal.citas') }}"><span>▦</span><strong>Mis citas</strong><small>Revisa tus reservas</small></a>
+        <a class="action-card" href="{{ route('portal.perfil') }}"><span>♙</span><strong>Mi perfil</strong><small>Actualiza tus datos</small></a>
+        <a class="action-card" href="{{ route('portal.historial-medico') }}"><span>▤</span><strong>Mi historial médico</strong><small>Consulta tu información</small></a>
+    @endif
+</div>
+@endsection

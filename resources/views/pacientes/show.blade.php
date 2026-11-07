@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos del paciente</title>
-</head>
-<body>
-    @if (session('success')) <p>{{ session('success') }}</p> @endif
+@extends('layouts.app')
+@section('title', 'Datos del paciente')
+@section('content')
+@if (session('success')) <p>{{ session('success') }}</p> @endif
     <h1>Datos del paciente</h1>
     <h2>Datos personales</h2>
     <p><strong>Código:</strong> {{ $paciente->codigo }}</p>
@@ -48,5 +43,4 @@
         <a href="{{ route('pacientes.edit', $paciente) }}">Editar paciente</a> |
         <a href="{{ route('pacientes.index') }}">Volver a la lista</a>
     </p>
-</body>
-</html>
+@endsection

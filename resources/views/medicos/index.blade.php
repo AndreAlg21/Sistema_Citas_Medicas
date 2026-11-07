@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de médicos</title>
-</head>
-<body>
-    <h1>Gestión de médicos</h1>
+@extends('layouts.app')
+@section('title', 'Gestión de médicos')
+@section('content')
+<h1>Gestión de médicos</h1>
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
@@ -75,5 +70,4 @@
 
         {{ $medicos->links() }}
     @endif
-</body>
-</html>
+@endsection

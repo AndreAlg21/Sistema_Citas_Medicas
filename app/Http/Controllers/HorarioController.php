@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Horario;
+use App\Models\Especialidad;
 use App\Models\Medico;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -11,7 +12,7 @@ class HorarioController extends Controller
 {
     public function index()
     {
-        $horarios = Horario::with('medico')
+        $horarios = Horario::with(['medico', 'especialidad'])
             ->orderBy('dia_semana')
             ->orderBy('hora_inicio')
             ->paginate(15);
@@ -26,12 +27,15 @@ class HorarioController extends Controller
             ->orderBy('nombres')
             ->get();
 
-        return view('horarios.create', compact('medicos'));
+        $especialidades = Especialidad::where('estado', true)->orderBy('nombre')->get();
+
+        return view('horarios.create', compact('medicos', 'especialidades'));
     }
 
     public function store(Request $request)
     {
         $datos = $request->validate($this->reglasValidacion());
+        $this->validarHorarioClinica($datos);
         $datos['estado'] = $request->boolean('estado');
 
         if ($this->existeChoque($datos)) {
@@ -49,7 +53,7 @@ class HorarioController extends Controller
 
     public function show(Horario $horario)
     {
-        $horario->load('medico');
+        $horario->load(['medico', 'especialidad']);
 
         return view('horarios.show', compact('horario'));
     }
@@ -61,13 +65,15 @@ class HorarioController extends Controller
             ->orderBy('apellidos')
             ->orderBy('nombres')
             ->get();
+        $especialidades = Especialidad::where('estado', true)->orderBy('nombre')->get();
 
-        return view('horarios.edit', compact('horario', 'medicos'));
+        return view('horarios.edit', compact('horario', 'medicos', 'especialidades'));
     }
 
     public function update(Request $request, Horario $horario)
     {
         $datos = $request->validate($this->reglasValidacion($horario));
+        $this->validarHorarioClinica($datos);
         $datos['estado'] = $request->boolean('estado');
 
         if ($this->existeChoque($datos, $horario)) {
@@ -107,10 +113,15 @@ class HorarioController extends Controller
                     }
                 }),
             ],
-            'dia_semana' => ['required', 'integer', 'between:1,7'],
+            'id_especialidad' => [
+                'required',
+                'integer',
+                Rule::exists('especialidades', 'id_especialidad')->where('estado', true),
+            ],
+            'dia_semana' => ['required', 'integer', 'between:1,5'],
             'hora_inicio' => ['required', 'date_format:H:i'],
             'hora_fin' => ['required', 'date_format:H:i', 'after:hora_inicio'],
-            'duracion_cita_min' => ['required', 'integer', 'between:5,240'],
+            'duracion_cita_min' => ['required', 'integer', 'in:15'],
             'consultorio' => ['required', 'string', 'max:40'],
             'estado' => ['required', 'boolean'],
         ];
@@ -130,6 +141,44 @@ class HorarioController extends Controller
             ->where('hora_fin', '>', $datos['hora_inicio'])
             ->exists()
             && (bool) $datos['estado'];
+    }
+
+    private function validarHorarioClinica(array $datos): void
+    {
+        $medicoAtiendeEspecialidad = Medico::query()
+            ->whereKey($datos['id_medico'])
+            ->whereHas(
+                'especialidades',
+                fn ($consulta) => $consulta->where(
+                    'especialidades.id_especialidad',
+                    $datos['id_especialidad']
+                )
+            )
+            ->exists();
+
+        if (!$medicoAtiendeEspecialidad) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'id_especialidad' => 'El médico debe tener asignada esta especialidad.',
+            ]);
+        }
+
+        $inicio = substr($datos['hora_inicio'], 0, 5);
+        $fin = substr($datos['hora_fin'], 0, 5);
+        $minutos = (int) substr($inicio, 3, 2);
+        $enManana = $inicio >= '07:00' && $inicio < '12:00' && $fin <= '12:00';
+        $enTarde = $inicio >= '14:00' && $inicio < '18:00' && $fin <= '18:00';
+
+        if (!$enManana && !$enTarde) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'hora_inicio' => 'El horario debe estar dentro de 07:00–12:00 o 14:00–18:00.',
+            ]);
+        }
+
+        if ($minutos % 15 !== 0) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'hora_inicio' => 'El inicio del horario debe coincidir con un intervalo de 15 minutos.',
+            ]);
+        }
     }
 }
 

@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear especialidad</title>
-</head>
-<body>
-    <h1>Crear especialidad</h1>
+@extends('layouts.app')
+@section('title', 'Crear especialidad')
+@section('content')
+<h1>Crear especialidad</h1>
 
     @if ($errors->any())
         <ul>
@@ -51,5 +46,4 @@
         <button type="submit">Guardar especialidad</button>
         <a href="{{ route('especialidades.index') }}">Cancelar</a>
     </form>
-</body>
-</html>
+@endsection

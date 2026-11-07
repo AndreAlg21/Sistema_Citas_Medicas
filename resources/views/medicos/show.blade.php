@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Datos del médico</title>
-</head>
-<body>
-    <h1>Datos del médico</h1>
+@extends('layouts.app')
+@section('title', 'Datos del médico')
+@section('content')
+<h1>Datos del médico</h1>
 
     <p><strong>Código:</strong> {{ $medico->codigo }}</p>
     <p><strong>Nombre:</strong> {{ $medico->nombres }} {{ $medico->apellidos }}</p>
@@ -33,5 +28,4 @@
         |
         <a href="{{ route('medicos.index') }}">Volver a la lista</a>
     </p>
-</body>
-</html>
+@endsection

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             PermisoSeeder::class,
             EspecialidadSeeder::class,
             RolPermisoSeeder::class,
+            ParametroSistemaSeeder::class,
         ]);
     }
 }

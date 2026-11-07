@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrar usuario</title>
-</head>
-<body>
-    <h1>Registrar usuario</h1>
+@extends('layouts.app')
+@section('title', 'Registrar usuario')
+@section('content')
+<h1>Registrar usuario</h1>
 
     @if ($errors->any())
         <ul>
@@ -114,5 +109,4 @@
         <button type="submit">Guardar usuario</button>
         <a href="{{ route('usuarios.index') }}">Cancelar</a>
     </form>
-</body>
-</html>
+@endsection

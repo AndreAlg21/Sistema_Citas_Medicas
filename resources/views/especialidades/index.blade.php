@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de especialidades</title>
-</head>
-<body>
-    <h1>Especialidades médicas</h1>
+@extends('layouts.app')
+@section('title', 'Gestión de especialidades')
+@section('content')
+<h1>Especialidades médicas</h1>
 
     @if (session('success'))
         <p>{{ session('success') }}</p>
@@ -65,5 +60,4 @@
             </tbody>
         </table>
     @endif
-</body>
-</html>
+@endsection

@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar usuario</title>
-</head>
-<body>
-    <h1>Editar usuario</h1>
+@extends('layouts.app')
+@section('title', 'Editar usuario')
+@section('content')
+<h1>Editar usuario</h1>
 
     @if ($errors->any())
         <ul>
@@ -129,5 +124,4 @@
         <button type="submit">Guardar cambios</button>
         <a href="{{ route('usuarios.index') }}">Cancelar</a>
     </form>
-</body>
-</html>
+@endsection

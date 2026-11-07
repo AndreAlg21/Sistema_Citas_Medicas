@@ -29,7 +29,6 @@ class RolPermisoSeeder extends Seeder
                 'auth.iniciar_sesion',
                 'auth.cerrar_sesion',
                 'auth.recuperar_contrasena',
-                'citas.consultar_disponibilidad',
                 'citas.controlar_asistencia',
                 'agenda.consultar',
                 'citas.consultar_historial',
@@ -47,6 +46,14 @@ class RolPermisoSeeder extends Seeder
                 'historial_medico.consultar',
             ],
         ];
+
+        $medico = Role::query()->where('nombre', 'Medico')->firstOrFail();
+        $permisoDisponibilidad = Permiso::query()
+            ->where('codigo', 'citas.consultar_disponibilidad')
+            ->value('id_permiso');
+        if ($permisoDisponibilidad) {
+            $medico->permisos()->detach($permisoDisponibilidad);
+        }
 
         $administrador = Role::query()
             ->where('nombre', 'Administrador')
