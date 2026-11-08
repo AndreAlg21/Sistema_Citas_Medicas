@@ -128,8 +128,20 @@
             seccion.querySelectorAll('[data-required="true"]').forEach((campo) => {
                 campo.required = visible;
             });
-            const especialidades = seccion.querySelectorAll('input[name="especialidades[]"]');
-            especialidades.forEach((campo, indice) => { campo.required = visible && indice === 0; });
+            const especialidades = Array.from(seccion.querySelectorAll('input[name="especialidades[]"]'));
+            const validarEspecialidades = () => {
+                const haySeleccionada = especialidades.some((opcion) => opcion.checked);
+                especialidades[0]?.setCustomValidity(
+                    visible && rolSeleccionado === 'Medico' && !haySeleccionada
+                        ? 'Selecciona al menos una especialidad.'
+                        : ''
+                );
+            };
+            especialidades.forEach((campo) => {
+                campo.required = false;
+                campo.onchange = validarEspecialidades;
+            });
+            validarEspecialidades();
         });
     };
 

@@ -45,7 +45,14 @@
                         <td>{{ $medico->nombres }} {{ $medico->apellidos }}</td>
                         <td>{{ $medico->registro_profesional }}</td>
                         <td>{{ $medico->especialidades->pluck('nombre')->join(', ') ?: 'Sin especialidad' }}</td>
-                        <td>{{ $medico->usuario?->nombre_completo ?? 'Sin cuenta vinculada' }}</td>
+                                                <td>
+                            @if ($medico->usuario)
+                                {{ $medico->usuario->nombre_completo }}<br>
+                                <small>Usuario: {{ $medico->usuario->nombre_usuario }}</small>
+                            @else
+                                Sin cuenta vinculada
+                            @endif
+                        </td>
                         <td>{{ $medico->telefono }}</td>
                         <td>{{ $medico->correo }}</td>
                         <td>{{ $medico->estado ? 'Activo' : 'Inactivo' }}</td>

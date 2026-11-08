@@ -18,8 +18,7 @@ class PacienteController extends Controller
     public function index()
     {
         $pacientes = Paciente::with('usuario')
-            ->orderBy('apellidos')
-            ->orderBy('nombres')
+            ->orderByDesc('id_paciente')
             ->paginate(15);
 
         return view('pacientes.index', compact('pacientes'));

@@ -14,7 +14,7 @@ class MedicoController extends Controller
     public function index()
     {
         $medicos = Medico::with(['usuario', 'especialidades'])
-            ->orderBy('apellidos')
+            ->orderByDesc('id_medico')
             ->paginate(10);
 
         return view('medicos.index', compact('medicos'));

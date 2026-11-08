@@ -16,7 +16,7 @@
     @else
         <table border="1" cellpadding="8">
             <thead>
-                <tr><th>Código</th><th>Paciente</th><th>Cédula</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr>
+                <tr><th>Código</th><th>Paciente</th><th>Cédula</th><th>Cuenta de acceso</th><th>Teléfono</th><th>Correo</th><th>Estado</th><th>Acciones</th></tr>
             </thead>
             <tbody>
                 @foreach ($pacientes as $paciente)
@@ -24,6 +24,7 @@
                         <td>{{ $paciente->codigo }}</td>
                         <td>{{ $paciente->nombres }} {{ $paciente->apellidos }}</td>
                         <td>{{ $paciente->ci ?? 'No registrada' }}</td>
+                        <td>{{ $paciente->usuario?->nombre_usuario ?? 'Sin cuenta vinculada' }}</td>
                         <td>{{ $paciente->telefono }}</td>
                         <td>{{ $paciente->correo ?? 'No registrado' }}</td>
                         <td>{{ $paciente->estado ? 'Activo' : 'Inactivo' }}</td>

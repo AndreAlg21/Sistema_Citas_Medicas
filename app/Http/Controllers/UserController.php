@@ -136,9 +136,21 @@ class UserController extends Controller
             }
         });
 
+        if ($rol->nombre === 'Paciente') {
+            return redirect()
+                ->route('pacientes.index')
+                ->with('success', 'La cuenta de acceso y la ficha del paciente se registraron correctamente.');
+        }
+
+        if ($rol->nombre === 'Medico') {
+            return redirect()
+                ->route('medicos.index')
+                ->with('success', 'La cuenta de acceso y la ficha del médico se registraron correctamente.');
+        }
+
         return redirect()
             ->route('usuarios.index')
-            ->with('success', 'La cuenta y los datos del perfil se registraron correctamente.');
+            ->with('success', 'La cuenta se registró correctamente.');
     }
 
     public function show(string $id)
