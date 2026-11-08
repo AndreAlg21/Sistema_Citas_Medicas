@@ -3,14 +3,13 @@
 @section('content')
 <section>
     <h1>Agenda médica</h1>
+    @if ($sinPerfilMedico)
+        <div class="notice">Esta cuenta todavía no está vinculada a un perfil médico. El administrador debe asignarle un perfil para que aparezcan citas en esta agenda.</div>
+    @endif
     <form method="GET" action="{{ route('citas.agenda') }}">
         @if ($rol !== 'Medico')
-            <label for="id_medico">Médico</label>
-            <select id="id_medico" name="id_medico"><option value="">Todos los médicos</option>
-                @foreach ($medicos as $medico)
-                    <option value="{{ $medico->id_medico }}" {{ $idMedico == $medico->id_medico ? 'selected' : '' }}>{{ $medico->apellidos }}, {{ $medico->nombres }}</option>
-                @endforeach
-            </select>
+            <label for="medico">Buscar médico por nombre, código o ID</label>
+            <input id="medico" type="search" name="medico" value="{{ request('medico') }}" placeholder="Ej.: Ana Fernández o MED-002">
         @endif
         <label for="fecha">Fecha</label><input type="date" id="fecha" name="fecha" value="{{ $fecha }}" required>
         <label for="estado">Estado</label>

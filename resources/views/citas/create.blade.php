@@ -37,17 +37,6 @@
                 @endforeach
             </select>
         </label>
-        <label for="id_medico">Médico (opcional)
-            <select id="id_medico" name="id_medico" disabled>
-                <option value="">Elige una especialidad primero</option>
-                @foreach ($medicos as $medico)
-                    <option value="{{ $medico->id_medico }}" data-especialidades="{{ $medico->especialidades->pluck('id_especialidad')->join(',') }}" @selected(($filtros['id_medico'] ?? request('id_medico')) == $medico->id_medico)>{{ $medico->nombres }} {{ $medico->apellidos }}</option>
-                @endforeach
-            </select>
-        </label>
-        <label for="consultorio">Consultorio (opcional)
-            <input type="text" id="consultorio" name="consultorio" maxlength="40" value="{{ $filtros['consultorio'] ?? request('consultorio') }}" placeholder="Cualquier consultorio">
-        </label>
         <label for="fecha">Fecha de la cita
             <input type="date" id="fecha" name="fecha" data-weekdays-only min="{{ today()->toDateString() }}" max="{{ today()->addDays(13)->toDateString() }}" value="{{ $filtros['fecha'] ?? request('fecha') }}" required>
         </label>
@@ -61,7 +50,7 @@
     @if (!$pacienteSeleccionado)
         <div class="notice notice-error">Primero ingresa un carnet válido para mostrar y confirmar la ficha del paciente.</div>
     @elseif (empty($opciones))
-        <div class="notice">No encontramos turnos libres con esos datos. Prueba otro médico o día dentro de las próximas dos semanas.</div>
+        <div class="notice">No encontramos turnos libres con esos datos. Prueba otra fecha dentro de las próximas dos semanas.</div>
     @else
         <div class="appointment-list">
         @foreach ($opciones as $opcion)
@@ -92,12 +81,6 @@
         const ciInput = document.getElementById('ci');
         const endpoint = @json(route('pacientes.buscar-ci'));
         const specialty = document.getElementById('id_especialidad');
-        const doctor = document.getElementById('id_medico');
-        const doctorChoices = [...doctor.querySelectorAll('option[data-especialidades]')].map((option) => ({
-            value: option.value,
-            text: option.textContent,
-            specialties: option.dataset.especialidades.split(','),
-        }));
         let lookupTimer;
 
         function showMessage(text, error = false) {
@@ -135,7 +118,6 @@
             const ci = ciInput.value.trim();
             specialty.disabled = true;
             specialty.value = '';
-            filterDoctors();
             if (ci.length < 4) {
                 showMessage('Escribe el carnet para consultar la ficha del paciente.');
                 return;
@@ -153,29 +135,6 @@
             }, 300);
         });
 
-        function filterDoctors() {
-            const selectedSpecialty = specialty.value;
-            const selectedDoctor = doctor.value;
-            const coincidencias = doctorChoices.filter((choice) =>
-                selectedSpecialty && choice.specialties.includes(selectedSpecialty)
-            );
-            doctor.disabled = !selectedSpecialty || coincidencias.length === 0;
-            doctor.replaceChildren(new Option(
-                !selectedSpecialty
-                    ? 'Elige una especialidad primero'
-                    : coincidencias.length
-                        ? 'Cualquier médico de esta especialidad'
-                        : 'No hay médicos asignados a esta especialidad',
-                ''
-            ));
-            coincidencias.forEach((choice) => {
-                doctor.add(new Option(choice.text, choice.value));
-            });
-            if ([...doctor.options].some((option) => option.value === selectedDoctor)) doctor.value = selectedDoctor;
-        }
-
-        specialty?.addEventListener('change', filterDoctors);
-        filterDoctors();
     })();
 </script>
 @endsection

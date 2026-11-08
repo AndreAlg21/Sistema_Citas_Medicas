@@ -14,12 +14,9 @@
         <label for="fecha_desde">Desde</label><input id="fecha_desde" type="date" name="fecha_desde" value="{{ $desde }}" required>
         <label for="fecha_hasta">Hasta</label><input id="fecha_hasta" type="date" name="fecha_hasta" value="{{ $hasta }}" required>
         @if ($tipo === 'citas')
-            <label for="id_medico">Médico</label>
-            <select id="id_medico" name="id_medico"><option value="">Todos</option>
-                @foreach ($medicos as $medico)
-                    <option value="{{ $medico->id_medico }}" {{ ($filtros['id_medico'] ?? '') == $medico->id_medico ? 'selected' : '' }}>{{ $medico->apellidos }}, {{ $medico->nombres }}</option>
-                @endforeach
-            </select>
+            <label for="medico">Buscar médico por nombre, código o ID
+                <input id="medico" type="search" name="medico" value="{{ $filtros['medico'] ?? '' }}" placeholder="Ej.: Ana Fernández o MED-002">
+            </label>
             <label for="id_especialidad">Especialidad</label>
             <select id="id_especialidad" name="id_especialidad"><option value="">Todas</option>
                 @foreach ($especialidades as $especialidad)

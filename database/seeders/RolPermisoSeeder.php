@@ -31,37 +31,36 @@ class RolPermisoSeeder extends Seeder
                 'auth.recuperar_contrasena',
                 'citas.controlar_asistencia',
                 'agenda.consultar',
-                'citas.consultar_historial',
-                'historial_medico.consultar',
             ],
             'Paciente' => [
                 'auth.iniciar_sesion',
                 'auth.cerrar_sesion',
                 'auth.recuperar_contrasena',
                 'citas.consultar_disponibilidad',
+                'citas.cancelar',
                 'pacientes.registrar_cuenta',
                 'pacientes.gestionar_perfil',
                 'citas.reservar_en_linea',
                 'citas.consultar_mis_citas',
                 'historial_medico.consultar',
             ],
+            'Administrador' => [
+                'auth.iniciar_sesion',
+                'auth.cerrar_sesion',
+                'auth.recuperar_contrasena',
+                'usuarios.gestionar',
+                'roles_permisos.gestionar',
+                'bitacoras.consultar',
+                'especialidades.gestionar',
+                'medicos.gestionar',
+                'horarios.gestionar',
+                'pacientes.gestionar',
+                'agenda.consultar',
+                'citas.consultar_historial',
+                'citas.controlar_asistencia',
+                'reportes.generar',
+            ],
         ];
-
-        $medico = Role::query()->where('nombre', 'Medico')->firstOrFail();
-        $permisoDisponibilidad = Permiso::query()
-            ->where('codigo', 'citas.consultar_disponibilidad')
-            ->value('id_permiso');
-        if ($permisoDisponibilidad) {
-            $medico->permisos()->detach($permisoDisponibilidad);
-        }
-
-        $administrador = Role::query()
-            ->where('nombre', 'Administrador')
-            ->firstOrFail();
-
-        $administrador->permisos()->syncWithoutDetaching(
-            Permiso::query()->pluck('id_permiso')->all()
-        );
 
         foreach ($permisosPorRol as $nombreRol => $codigos) {
             $rol = Role::query()
@@ -73,7 +72,9 @@ class RolPermisoSeeder extends Seeder
                 ->pluck('id_permiso')
                 ->all();
 
-            $rol->permisos()->syncWithoutDetaching($idsPermisos);
+            // Reemplaza los permisos anteriores para retirar accesos sobrantes
+            // y dejar exactamente los asignados a cada actor en el documento.
+            $rol->permisos()->sync($idsPermisos);
         }
     }
 }

@@ -16,14 +16,14 @@
     @if (in_array($cita->estado, ['Programada', 'Confirmada'], true) && auth()->user()->role?->nombre === 'Recepcionista')
         <a class="button" href="{{ route('citas.edit', $cita) }}">Reprogramar</a>
     @endif
-    @if (in_array($cita->estado, ['Programada', 'Confirmada'], true) && in_array(auth()->user()->role?->nombre, ['Recepcionista', 'Administrador'], true))
+    @if (in_array($cita->estado, ['Programada', 'Confirmada'], true) && auth()->user()->role?->nombre === 'Recepcionista')
         <form method="POST" action="{{ route('citas.cancelar', $cita) }}" class="inline">
             @csrf
             <label>Motivo de cancelación <input name="motivo_cancelacion" maxlength="200" required></label>
             <button type="submit">Cancelar cita</button>
         </form>
     @endif
-    @if (in_array(auth()->user()->role?->nombre, ['Recepcionista', 'Administrador'], true))
+    @if (auth()->user()->role?->nombre === 'Recepcionista')
         @if ($cita->estado === 'Programada')
             <form method="POST" action="{{ route('citas.estado', $cita) }}" class="inline">@csrf @method('PATCH')
                 <input type="hidden" name="estado" value="Confirmada"><button type="submit">Confirmar</button>

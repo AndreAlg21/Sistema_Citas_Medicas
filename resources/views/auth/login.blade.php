@@ -21,6 +21,10 @@
         .footer { margin: 23px 0 0; color: #698176; font-size: 12px; text-align: center; }
         .footer a { color: #08744f; font-weight: 700; text-decoration: none; }
         .footer a:hover { text-decoration: underline; }
+        .form-links { display: flex; justify-content: flex-end; margin-top: 9px; font-size: 12px; }
+        .form-links a { color: #08744f; font-weight: 700; text-decoration: none; }
+        .form-links a:hover { text-decoration: underline; }
+        .status { margin: 14px 0; padding: 12px 14px; border: 1px solid #cce4d2; border-radius: 10px; background: #f0faf2; color: #3f6f50; font-size: 13px; line-height: 1.5; }
         @media (max-width: 500px) { .card { padding: 30px 23px; border-radius: 17px; } }
     </style>
 </head>
@@ -31,7 +35,7 @@
         <p class="intro">Ingresa con tu correo o nombre de usuario para continuar.</p>
 
         @if (session('success'))
-            <p class="footer">{{ session('success') }}</p>
+            <p class="status">{{ session('success') }}</p>
         @endif
 
         <form method="POST" action="{{ route('login.store') }}">
@@ -45,6 +49,7 @@
 
             <label for="contrasena">Contraseña</label>
             <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" required>
+            <div class="form-links"><a href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a></div>
             @error('contrasena')
                 <div class="error">{{ $message }}</div>
             @enderror

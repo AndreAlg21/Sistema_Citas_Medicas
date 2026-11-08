@@ -40,10 +40,7 @@ class LoginController extends Controller
         }
 
         if ($usuario->bloqueado_hasta && $usuario->bloqueado_hasta->isPast()) {
-            $usuario->forceFill([
-                'intentos_fallidos' => 0,
-                'bloqueado_hasta' => null,
-            ])->save();
+            $usuario->forceFill(['bloqueado_hasta' => null])->save();
         }
 
         if ($usuario->bloqueado_hasta && $usuario->bloqueado_hasta->isFuture()) {
@@ -73,15 +70,22 @@ class LoginController extends Controller
         $intentos = (int) $usuario->intentos_fallidos + 1;
         $actualizacion = ['intentos_fallidos' => $intentos];
 
-        if ($intentos >= 5) {
-            $actualizacion['bloqueado_hasta'] = now()->addMinutes(15);
+        $limiteIntentos = 3;
+        if ($intentos >= $limiteIntentos) {
+            $nivelBloqueo = min(7, intdiv($intentos - 1, $limiteIntentos));
+            $segundosBloqueo = min(30 * (2 ** $nivelBloqueo), 3600);
+            $actualizacion['bloqueado_hasta'] = now()->addSeconds($segundosBloqueo);
         }
 
         $usuario->forceFill($actualizacion)->save();
 
-        $mensaje = $intentos >= 5
-            ? 'La cuenta quedó bloqueada por 15 minutos.'
-            : 'Los datos ingresados no son correctos.';
+        if ($intentos >= $limiteIntentos) {
+            $mensaje = "La cuenta quedó bloqueada durante {$segundosBloqueo} segundos.";
+        } else {
+            $siguienteBloqueo = $limiteIntentos * (intdiv($intentos - 1, $limiteIntentos) + 1);
+            $restantes = $siguienteBloqueo - $intentos;
+            $mensaje = "Los datos no son correctos. Tienes {$restantes} intento(s) antes del siguiente bloqueo.";
+        }
 
         return back()
             ->withErrors(['identificador' => $mensaje])

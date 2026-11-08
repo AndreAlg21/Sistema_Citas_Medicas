@@ -11,6 +11,7 @@
     @if ($rol === 'Administrador')
         <a class="action-card" href="{{ route('usuarios.index') }}"><span>♙</span><strong>Usuarios</strong><small>Cuentas y accesos</small></a>
         <a class="action-card" href="{{ route('roles.index') }}"><span>⚙</span><strong>Roles y permisos</strong><small>Configura accesos</small></a>
+        <a class="action-card" href="{{ route('bitacora.index') }}"><span>▤</span><strong>Bitácora</strong><small>Revisa accesos y acciones</small></a>
         <a class="action-card" href="{{ route('especialidades.index') }}"><span>✳</span><strong>Especialidades</strong><small>Servicios médicos</small></a>
         <a class="action-card" href="{{ route('medicos.index') }}"><span>✚</span><strong>Médicos</strong><small>Perfiles profesionales</small></a>
         <a class="action-card" href="{{ route('horarios.index') }}"><span>◷</span><strong>Horarios</strong><small>Jornadas por especialidad</small></a>

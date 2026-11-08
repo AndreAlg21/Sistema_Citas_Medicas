@@ -12,15 +12,6 @@
                 <option value="{{ $especialidad->id_especialidad }}" {{ request('id_especialidad') == $especialidad->id_especialidad ? 'selected' : '' }}>{{ $especialidad->nombre }}</option>
             @endforeach
         </select>
-        <label for="id_medico">Médico (opcional)</label>
-        <select id="id_medico" name="id_medico">
-            <option value="">Cualquier médico</option>
-            @foreach ($medicos as $medico)
-                <option value="{{ $medico->id_medico }}" {{ request('id_medico') == $medico->id_medico ? 'selected' : '' }}>{{ $medico->nombres }} {{ $medico->apellidos }}</option>
-            @endforeach
-        </select>
-        <label for="consultorio">Consultorio (opcional)</label>
-        <input type="text" id="consultorio" name="consultorio" maxlength="40" value="{{ request('consultorio') }}">
         <label for="fecha">Fecha</label>
         <input type="date" id="fecha" name="fecha" data-weekdays-only min="{{ today()->toDateString() }}" max="{{ today()->addDays(13)->toDateString() }}" value="{{ request('fecha') }}" required>
         <button type="submit">Buscar horarios</button>
@@ -36,8 +27,6 @@
             @foreach ($sugerencias as $fechaSugerida)
                 <a class="button" href="{{ route('citas.disponibilidad', [
                     'id_especialidad' => request('id_especialidad'),
-                    'id_medico' => request('id_medico'),
-                    'consultorio' => request('consultorio'),
                     'fecha' => $fechaSugerida,
                 ]) }}">{{ \Illuminate\Support\Carbon::parse($fechaSugerida)->format('d/m/Y') }}</a>
             @endforeach
@@ -67,7 +56,7 @@
                                 <button type="submit">Reservar</button>
                             </form>
                         @elseif (auth()->user()->role?->nombre === 'Recepcionista')
-                            <a class="button" href="{{ route('citas.create', ['id_especialidad'=>$opcion['id_especialidad'],'id_medico'=>$opcion['id_medico'],'fecha'=>$opcion['fecha'],'hora_inicio'=>$opcion['hora_inicio']]) }}">Elegir horario</a>
+                            <a class="button" href="{{ route('citas.create', ['id_especialidad'=>$opcion['id_especialidad'],'fecha'=>$opcion['fecha'],'hora_inicio'=>$opcion['hora_inicio']]) }}">Elegir horario</a>
                         @else
                             <span>Disponible</span>
                         @endif

@@ -18,6 +18,7 @@ class Bitacora extends Model
         'valores_nuevos',
         'fecha_hora',
         'id_usuario',
+        'direccion_ip',
     ];
 
     protected function casts(): array

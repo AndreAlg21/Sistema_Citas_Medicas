@@ -45,31 +45,13 @@ class CitaController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        $medicos = Medico::query()
-            ->with('especialidades')
-            ->where('estado', true)
-            ->when(
-                $filtros['id_especialidad'] ?? null,
-                fn ($consulta, $id) => $consulta->whereHas(
-                    'especialidades',
-                    fn ($especialidades) => $especialidades->where(
-                        'especialidades.id_especialidad',
-                        $id
-                    )
-                )
-            )
-            ->orderBy('apellidos')
-            ->orderBy('nombres')
-            ->get();
-
         $opciones = $filtros === []
             ? []
             : $this->disponibilidad->buscar(
                 (int) $filtros['id_especialidad'],
-                isset($filtros['id_medico']) ? (int) $filtros['id_medico'] : null,
-                $filtros['fecha'],
                 null,
-                $filtros['consultorio'] ?? null
+                $filtros['fecha'],
+                null
             );
 
         $sugerencias = [];
@@ -82,10 +64,9 @@ class CitaController extends Controller
                 }
                 $alternativas = $this->disponibilidad->buscar(
                     (int) $filtros['id_especialidad'],
-                    isset($filtros['id_medico']) ? (int) $filtros['id_medico'] : null,
-                    $fechaAlternativa,
                     null,
-                    $filtros['consultorio'] ?? null
+                    $fechaAlternativa,
+                    null
                 );
                 if ($alternativas !== []) {
                     $sugerencias[] = $fechaAlternativa;
@@ -95,7 +76,6 @@ class CitaController extends Controller
 
         return view('citas.disponibilidad', compact(
             'especialidades',
-            'medicos',
             'filtros',
             'opciones',
             'sugerencias'
@@ -122,26 +102,17 @@ class CitaController extends Controller
             ->orderBy('nombre')
             ->get();
 
-        $medicos = Medico::query()
-            ->with('especialidades')
-            ->where('estado', true)
-            ->orderBy('apellidos')
-            ->orderBy('nombres')
-            ->get();
-
         $opciones = $filtros === []
             ? []
             : $this->disponibilidad->buscar(
                 (int) $filtros['id_especialidad'],
-                isset($filtros['id_medico']) ? (int) $filtros['id_medico'] : null,
-                $filtros['fecha'],
                 null,
-                $filtros['consultorio'] ?? null
+                $filtros['fecha'],
+                null
             );
 
         return view('citas.create', compact(
             'especialidades',
-            'medicos',
             'filtros',
             'opciones',
             'ci',
@@ -505,32 +476,39 @@ class CitaController extends Controller
 
         $datos = $request->validate([
             'fecha' => ['nullable', 'date_format:Y-m-d'],
-            'id_medico' => ['nullable', 'integer', 'exists:medicos,id_medico'],
+            'medico' => ['nullable', 'string', 'max:120'],
             'estado' => ['nullable', Rule::in(['Programada', 'Confirmada', 'Atendida', 'Cancelada', 'Inasistencia'])],
         ]);
 
         $rol = $request->user()->role?->nombre;
-        $medicos = Medico::query()->where('estado', true)->orderBy('apellidos')->get();
-        $idMedico = $datos['id_medico'] ?? null;
+        $idMedico = null;
+        $sinPerfilMedico = false;
 
         if ($rol === 'Medico') {
             $idMedico = Medico::query()
                 ->where('id_usuario', $request->user()->id_usuario)
                 ->value('id_medico');
-
-            abort_if(!$idMedico, 403, 'Tu usuario no está vinculado a un perfil médico.');
+            $sinPerfilMedico = !$idMedico;
+        } elseif (filled($datos['medico'] ?? null)) {
+            $idMedico = $this->buscarMedicoPorIdentificador($datos['medico']);
+            if (!$idMedico) {
+                throw ValidationException::withMessages([
+                    'medico' => 'No encontramos un médico con ese nombre, código o ID.',
+                ]);
+            }
         }
 
         $fecha = $datos['fecha'] ?? today()->toDateString();
         $citas = Cita::query()
             ->with(['paciente', 'medico', 'especialidad'])
             ->whereDate('fecha', $fecha)
+            ->when($sinPerfilMedico, fn ($consulta) => $consulta->whereRaw('1 = 0'))
             ->when($idMedico, fn ($consulta) => $consulta->where('id_medico', $idMedico))
             ->when($datos['estado'] ?? null, fn ($consulta, $estado) => $consulta->where('estado', $estado))
             ->orderBy('hora_inicio')
             ->get();
 
-        return view('citas.agenda', compact('citas', 'medicos', 'fecha', 'idMedico', 'rol'));
+        return view('citas.agenda', compact('citas', 'fecha', 'idMedico', 'rol', 'sinPerfilMedico'));
     }
 
     public function historialPaciente(Request $request, Paciente $paciente): View
@@ -567,13 +545,7 @@ class CitaController extends Controller
                 'integer',
                 Rule::exists('especialidades', 'id_especialidad')->where('estado', true),
             ],
-            'id_medico' => [
-                'nullable',
-                'integer',
-                Rule::exists('medicos', 'id_medico')->where('estado', true),
-            ],
             'fecha' => $this->reglasFechaReserva(),
-            'consultorio' => ['nullable', 'string', 'max:40'],
         ], $this->mensajesFechaReserva());
     }
 
@@ -760,5 +732,30 @@ class CitaController extends Controller
     private function parametroEntero(string $clave, int $defecto): int
     {
         return (int) (ParametroSistema::query()->where('clave', $clave)->value('valor') ?? $defecto);
+    }
+
+    private function buscarMedicoPorIdentificador(string $busqueda): ?int
+    {
+        $busqueda = trim($busqueda);
+        $palabras = preg_split('/\s+/', mb_strtolower($busqueda), -1, PREG_SPLIT_NO_EMPTY);
+
+        $medico = Medico::query()->where('estado', true)
+            ->where(function ($consulta) use ($busqueda, $palabras): void {
+                $consulta->where('codigo', $busqueda);
+                if (ctype_digit($busqueda)) {
+                    $consulta->orWhere('id_medico', (int) $busqueda);
+                }
+                $consulta->orWhere(function ($nombres) use ($palabras): void {
+                    foreach ($palabras as $palabra) {
+                        $nombres->where(function ($coincidencia) use ($palabra): void {
+                            $coincidencia->whereRaw('LOWER(nombres) LIKE ?', ['%' . $palabra . '%'])
+                                ->orWhereRaw('LOWER(apellidos) LIKE ?', ['%' . $palabra . '%']);
+                        });
+                    }
+                });
+            })
+            ->first(['id_medico']);
+
+        return $medico?->id_medico;
     }
 }

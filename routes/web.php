@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RecuperarContrasenaController;
+use App\Http\Controllers\BitacoraController;
 use App\Http\Controllers\CitaController;
 use App\Http\Controllers\EspecialidadController;
 use App\Http\Controllers\HorarioController;
@@ -14,9 +16,18 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => redirect()->route('login'));
 
-Route::middleware('guest')->group(function (): void {
+Route::middleware(['guest', 'bitacora'])->group(function (): void {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+
+    Route::get('/contrasena/recuperar', [RecuperarContrasenaController::class, 'solicitar'])
+        ->name('password.request');
+    Route::post('/contrasena/recuperar', [RecuperarContrasenaController::class, 'enviarEnlace'])
+        ->name('password.email');
+    Route::get('/contrasena/restablecer/{token}', [RecuperarContrasenaController::class, 'formularioRestablecer'])
+        ->name('password.reset');
+    Route::post('/contrasena/restablecer', [RecuperarContrasenaController::class, 'restablecer'])
+        ->name('password.update');
 
     Route::get('/registro', [PortalPacienteController::class, 'formularioRegistro'])
         ->name('pacientes.registro');
@@ -24,7 +35,7 @@ Route::middleware('guest')->group(function (): void {
         ->name('pacientes.registro.store');
 });
 
-Route::middleware('auth')->group(function (): void {
+Route::middleware(['auth', 'bitacora'])->group(function (): void {
     Route::get('/inicio', fn () => view('inicio'))->name('inicio');
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 
@@ -90,4 +101,7 @@ Route::middleware('auth')->group(function (): void {
     Route::resource('medicos', MedicoController::class)->middleware('administrador');
     Route::resource('horarios', HorarioController::class)->middleware('administrador');
     Route::resource('pacientes', PacienteController::class)->middleware('permiso:pacientes.gestionar');
+    Route::get('/bitacora', [BitacoraController::class, 'index'])
+        ->middleware(['administrador', 'permiso:bitacoras.consultar'])
+        ->name('bitacora.index');
 });

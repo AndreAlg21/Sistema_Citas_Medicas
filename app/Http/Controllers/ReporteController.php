@@ -8,6 +8,7 @@ use App\Models\Medico;
 use App\Models\Paciente;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class ReporteController extends Controller
@@ -19,7 +20,7 @@ class ReporteController extends Controller
                 'tipo' => ['nullable', Rule::in(['citas', 'pacientes'])],
                 'fecha_desde' => ['nullable', 'date_format:Y-m-d'],
                 'fecha_hasta' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:fecha_desde'],
-                'id_medico' => ['nullable', 'integer', 'exists:medicos,id_medico'],
+                'medico' => ['nullable', 'string', 'max:120'],
                 'id_especialidad' => ['nullable', 'integer', 'exists:especialidades,id_especialidad'],
                 'estado' => ['nullable', Rule::in(['Programada', 'Confirmada', 'Atendida', 'Cancelada', 'Inasistencia'])],
             ])
@@ -54,10 +55,12 @@ class ReporteController extends Controller
             ));
         }
 
+        $idMedico = $this->buscarMedicoPorIdentificador($filtros['medico'] ?? null);
+
         $citas = Cita::query()
             ->with(['paciente', 'medico', 'especialidad'])
             ->whereBetween('fecha', [$desde, $hasta])
-            ->when($filtros['id_medico'] ?? null, fn ($consulta, $id) => $consulta->where('id_medico', $id))
+            ->when($idMedico, fn ($consulta, $id) => $consulta->where('id_medico', $id))
             ->when($filtros['id_especialidad'] ?? null, fn ($consulta, $id) => $consulta->where('id_especialidad', $id))
             ->when($filtros['estado'] ?? null, fn ($consulta, $estado) => $consulta->where('estado', $estado))
             ->orderBy('fecha')
@@ -67,7 +70,6 @@ class ReporteController extends Controller
         $totales = $citas->groupBy('estado')->map->count();
         $totales['total'] = $citas->count();
         $pacientes = collect();
-        $medicos = Medico::query()->where('estado', true)->orderBy('apellidos')->get();
         $especialidades = Especialidad::query()->where('estado', true)->orderBy('nombre')->get();
 
         return view('reportes.index', compact(
@@ -77,9 +79,42 @@ class ReporteController extends Controller
             'pacientes',
             'citas',
             'totales',
-            'medicos',
             'especialidades',
             'filtros'
         ));
+    }
+
+    private function buscarMedicoPorIdentificador(?string $busqueda): ?int
+    {
+        if (blank($busqueda)) {
+            return null;
+        }
+
+        $busqueda = trim($busqueda);
+        $palabras = preg_split('/\s+/', mb_strtolower($busqueda), -1, PREG_SPLIT_NO_EMPTY);
+        $medico = Medico::query()->where('estado', true)
+            ->where(function ($consulta) use ($busqueda, $palabras): void {
+                $consulta->where('codigo', $busqueda);
+                if (ctype_digit($busqueda)) {
+                    $consulta->orWhere('id_medico', (int) $busqueda);
+                }
+                $consulta->orWhere(function ($nombres) use ($palabras): void {
+                    foreach ($palabras as $palabra) {
+                        $nombres->where(function ($coincidencia) use ($palabra): void {
+                            $coincidencia->whereRaw('LOWER(nombres) LIKE ?', ['%' . $palabra . '%'])
+                                ->orWhereRaw('LOWER(apellidos) LIKE ?', ['%' . $palabra . '%']);
+                        });
+                    }
+                });
+            })
+            ->first(['id_medico']);
+
+        if (!$medico) {
+            throw ValidationException::withMessages([
+                'medico' => 'No encontramos un médico con ese nombre, código o ID.',
+            ]);
+        }
+
+        return (int) $medico->id_medico;
     }
 }

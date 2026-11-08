@@ -36,6 +36,21 @@
         .side-nav a:hover { color: #fff; background: #ffffff20; }
         .nav-icon { display: grid; flex: 0 0 22px; place-items: center; width: 22px; color: #a9ddbc; font-size: 15px; }
         .nav-group-title { margin: 14px 11px 5px; color: #abd5b8; font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+        .nav-package { margin: 2px 0; }
+        .nav-package summary { display: flex; align-items: center; gap: 12px; min-height: 43px; padding: 9px 11px; border-radius: 10px; color: #e4f5e9; font-size: 13px; font-weight: 700; list-style: none; cursor: pointer; white-space: nowrap; }
+        .nav-package summary::-webkit-details-marker { display: none; }
+        .nav-package summary::after { content: "⌄"; margin-left: auto; color: #a9ddbc; transition: transform .16s; }
+        .nav-package[open] summary::after { transform: rotate(180deg); }
+        .nav-package summary:hover { color: #fff; background: #ffffff20; }
+        .package-items { display: grid; gap: 2px; margin: 2px 0 6px 12px; padding-left: 8px; border-left: 1px solid #ffffff40; }
+        .side-nav .package-items a { min-height: 37px; padding: 7px 9px; color: #cce7d3; font-size: 12px; }
+        .side-nav .package-items a:hover { color: #fff; background: #ffffff18; }
+        .side-nav .package-items a[aria-current="page"] { color: #075d43; background: #daf4e1; }
+        .audit-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); align-items: end; gap: 8px 16px; }
+        .audit-filters label { margin-top: 4px; }
+        .audit-filters .form-actions { margin-top: 0; }
+        .sidebar-backdrop { display: none; }
+        .sidebar-backdrop:hover { transform: none; background: #10251c80; box-shadow: none; }
         .sidebar-bottom { flex: 0 0 auto; margin-top: auto; padding-top: 13px; border-top: 1px solid #ffffff35; }
         .user-summary { margin: 0 8px 12px; color: #b9ddc5; font-size: 11px; line-height: 1.5; }
         .user-summary strong { display: block; color: #fff; font-size: 12px; }
@@ -51,6 +66,9 @@
         body.sidebar-compact .brand-name, body.sidebar-compact .nav-label, body.sidebar-compact .nav-group-title, body.sidebar-compact .user-summary { display: none; }
         body.sidebar-compact .brand-link { justify-content: center; margin-left: 0; margin-right: 0; }
         body.sidebar-compact .side-nav a { justify-content: center; padding-inline: 5px; }
+        body.sidebar-compact .nav-package summary { justify-content: center; padding-inline: 5px; font-size: 0; }
+        body.sidebar-compact .nav-package summary::after { display: none; }
+        body.sidebar-compact .nav-package[open] .package-items { display: none; }
         body.sidebar-compact .logout-form button { justify-content: center; font-size: 0; }
         body.sidebar-compact .logout-form button::before { content: "↪"; font-size: 16px; }
         main { width: min(1200px, 100%); margin: 26px auto; padding: 0 clamp(18px, 3vw, 42px) 64px; }
@@ -143,22 +161,34 @@
         .inline input, .inline select { display: inline-block; width: auto; }
         .side-nav a[aria-current="page"] { color: #075d43; background: #daf4e1; }
         @media (max-width: 760px) {
-            .sidebar { width: 76px; padding-inline: 10px; }
-            .brand-name, .nav-label, .nav-group-title, .user-summary { display: none; }
-            .brand-link { justify-content: center; margin-inline: 0; }
-            .side-nav a { justify-content: center; padding-inline: 5px; }
-            .main-area { margin-left: 76px; }
-            body.sidebar-open .sidebar { width: 240px; box-shadow: 12px 0 30px #18374018; }
-            body.sidebar-open .main-area { margin-left: 76px; }
-            body.sidebar-open .brand-name, body.sidebar-open .nav-label, body.sidebar-open .nav-group-title, body.sidebar-open .user-summary { display: initial; }
-            body.sidebar-open .side-nav a { justify-content: flex-start; padding-inline: 11px; }
+            .sidebar { width: min(84vw, 290px); padding-inline: 14px; transform: translateX(-105%); box-shadow: 12px 0 30px #18374018; }
+            .main-area, body.sidebar-compact .main-area { margin-left: 0; }
+            .brand-name, .nav-label, .nav-group-title, .user-summary { display: initial; }
+            body.sidebar-compact .brand-name, body.sidebar-compact .nav-label, body.sidebar-compact .nav-group-title, body.sidebar-compact .user-summary { display: initial; }
+            .brand-link { justify-content: flex-start; margin-inline: 4px; }
+            .side-nav a { justify-content: flex-start; padding-inline: 11px; }
+            body.sidebar-compact .side-nav a { justify-content: flex-start; padding-inline: 11px; }
+            .nav-package summary { justify-content: flex-start; padding-inline: 11px; font-size: 13px; }
+            body.sidebar-compact .nav-package summary { justify-content: flex-start; padding-inline: 11px; font-size: 13px; }
+            body.sidebar-compact .nav-package summary::after { display: block; }
+            .nav-package summary::after { display: block; }
+            .sidebar-backdrop { position: fixed; inset: 0; z-index: 9; display: none; width: 100%; height: 100%; margin: 0; padding: 0; border: 0; border-radius: 0; background: #10251c80; }
+            body.sidebar-open .sidebar { transform: translateX(0); }
+            body.sidebar-open .sidebar-backdrop { display: block; }
+            body.sidebar-open .nav-package[open] .package-items { display: grid; }
             .topbar { min-height: 55px; padding: 10px 15px; }
             .mobile-menu { display: inline-flex; margin: 0 10px 0 0; padding: 6px 10px; }
             main { margin: 20px auto; padding: 0 14px 40px; }
             section, .panel { padding: 20px 16px; border-radius: 14px; }
-            table { display: block; overflow-x: auto; white-space: nowrap; }
-            .appointment-option { grid-template-columns: 64px 1fr; }
+            table { display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+            .appointment-option { grid-template-columns: 64px minmax(0, 1fr); }
             .appointment-option__form { grid-column: 1 / -1; }
+            .section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+            .form-actions { align-items: stretch; }
+            .form-actions button, .form-actions .button { flex: 1 1 auto; }
+            button, .button { min-height: 44px; }
+            body.sidebar-compact .logout-form button { justify-content: flex-start; font-size: 13px; }
+            body.sidebar-compact .logout-form button::before { content: none; }
         }
     </style>
 </head>
@@ -170,32 +200,79 @@
         <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Contraer o desplegar menú" title="Contraer o desplegar menú">‹</button>
         <nav class="side-nav">
             <a href="{{ route('inicio') }}"><span class="nav-icon">⌂</span><span class="nav-label">Inicio</span></a>
-            @if (in_array($rolActual, ['Recepcionista', 'Administrador'], true))
-                <span class="nav-group-title">Atención</span>
-                <a href="{{ route('citas.disponibilidad') }}"><span class="nav-icon">◷</span><span class="nav-label">Disponibilidad</span></a>
-                <a href="{{ route('citas.create') }}"><span class="nav-icon">＋</span><span class="nav-label">Registrar cita</span></a>
-                <a href="{{ route('citas.agenda') }}"><span class="nav-icon">▦</span><span class="nav-label">Agenda</span></a>
-                <a href="{{ route('pacientes.index') }}"><span class="nav-icon">♙</span><span class="nav-label">Pacientes</span></a>
-                <a href="{{ route('reportes.index') }}"><span class="nav-icon">▤</span><span class="nav-label">Reportes</span></a>
-            @endif
-            @if ($rolActual === 'Medico')
-                <span class="nav-group-title">Mi espacio</span>
-                <a href="{{ route('citas.agenda') }}"><span class="nav-icon">▦</span><span class="nav-label">Mi agenda</span></a>
-            @endif
-            @if ($rolActual === 'Paciente')
-                <span class="nav-group-title">Mi atención</span>
-                <a href="{{ route('citas.disponibilidad') }}"><span class="nav-icon">◷</span><span class="nav-label">Reservar cita</span></a>
-                <a href="{{ route('portal.citas') }}"><span class="nav-icon">▦</span><span class="nav-label">Mis citas</span></a>
-                <a href="{{ route('portal.perfil') }}"><span class="nav-icon">♙</span><span class="nav-label">Mi perfil</span></a>
-                <a href="{{ route('portal.historial-medico') }}"><span class="nav-icon">▤</span><span class="nav-label">Historial médico</span></a>
-            @endif
             @if ($rolActual === 'Administrador')
-                <span class="nav-group-title">Administración</span>
-                <a href="{{ route('usuarios.index') }}"><span class="nav-icon">♙</span><span class="nav-label">Usuarios</span></a>
-                <a href="{{ route('medicos.index') }}"><span class="nav-icon">✚</span><span class="nav-label">Médicos</span></a>
-                <a href="{{ route('especialidades.index') }}"><span class="nav-icon">✳</span><span class="nav-label">Especialidades</span></a>
-                <a href="{{ route('horarios.index') }}"><span class="nav-icon">◷</span><span class="nav-label">Horarios</span></a>
-                <a href="{{ route('roles.index') }}"><span class="nav-icon">⚙</span><span class="nav-label">Roles y permisos</span></a>
+                <span class="nav-group-title">Paquetes del sistema</span>
+                <details class="nav-package" {{ request()->routeIs('usuarios.*', 'roles.*', 'bitacora.*') ? 'open' : '' }}>
+                    <summary title="Seguridad y usuarios"><span class="nav-icon">♙</span><span class="nav-label">Seguridad y usuarios</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('usuarios.index') }}" title="Usuarios"><span class="nav-icon">♙</span><span class="nav-label">Usuarios</span></a>
+                        <a href="{{ route('roles.index') }}" title="Roles y permisos"><span class="nav-icon">⚙</span><span class="nav-label">Roles y permisos</span></a>
+                        <a href="{{ route('bitacora.index') }}" title="Bitácora del sistema"><span class="nav-icon">▤</span><span class="nav-label">Bitácora del sistema</span></a>
+                    </div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('especialidades.*', 'medicos.*', 'horarios.*') ? 'open' : '' }}>
+                    <summary title="Catálogos médicos"><span class="nav-icon">✚</span><span class="nav-label">Catálogos médicos</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('especialidades.index') }}" title="Especialidades"><span class="nav-icon">✳</span><span class="nav-label">Especialidades</span></a>
+                        <a href="{{ route('medicos.index') }}" title="Médicos"><span class="nav-icon">✚</span><span class="nav-label">Médicos</span></a>
+                        <a href="{{ route('horarios.index') }}" title="Horarios"><span class="nav-icon">◷</span><span class="nav-label">Horarios</span></a>
+                    </div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('pacientes.*') ? 'open' : '' }}>
+                    <summary title="Pacientes"><span class="nav-icon">♙</span><span class="nav-label">Pacientes</span></summary>
+                    <div class="package-items"><a href="{{ route('pacientes.index') }}" title="Gestión de pacientes"><span class="nav-icon">♙</span><span class="nav-label">Gestión de pacientes e historial</span></a></div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('citas.*') ? 'open' : '' }}>
+                    <summary title="Citas"><span class="nav-icon">▦</span><span class="nav-label">Citas</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('citas.agenda') }}" title="Agenda"><span class="nav-icon">▦</span><span class="nav-label">Consultar agenda</span></a>
+                    </div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('reportes.*') ? 'open' : '' }}>
+                    <summary title="Reportes"><span class="nav-icon">▤</span><span class="nav-label">Reportes</span></summary>
+                    <div class="package-items"><a href="{{ route('reportes.index') }}" title="Reportes"><span class="nav-icon">▤</span><span class="nav-label">Generar reportes</span></a></div>
+                </details>
+            @elseif ($rolActual === 'Recepcionista')
+                <span class="nav-group-title">Paquetes del sistema</span>
+                <details class="nav-package" {{ request()->routeIs('pacientes.*') ? 'open' : '' }}>
+                    <summary title="Pacientes"><span class="nav-icon">♙</span><span class="nav-label">Pacientes</span></summary>
+                    <div class="package-items"><a href="{{ route('pacientes.index') }}" title="Gestión de pacientes"><span class="nav-icon">♙</span><span class="nav-label">Registrar y gestionar pacientes</span></a></div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('citas.*', 'agenda.*') ? 'open' : '' }}>
+                    <summary title="Citas"><span class="nav-icon">▦</span><span class="nav-label">Citas</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('citas.disponibilidad') }}" title="Consultar disponibilidad"><span class="nav-icon">◷</span><span class="nav-label">Consultar disponibilidad</span></a>
+                        <a href="{{ route('citas.create') }}" title="Registrar cita"><span class="nav-icon">＋</span><span class="nav-label">Registrar cita</span></a>
+                        <a href="{{ route('citas.agenda') }}" title="Agenda, reprogramación y estados"><span class="nav-icon">▦</span><span class="nav-label">Agenda y gestión de citas</span></a>
+                        <a href="{{ route('pacientes.index') }}" title="Historial de citas"><span class="nav-icon">▤</span><span class="nav-label">Historial de citas</span></a>
+                    </div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('reportes.*') ? 'open' : '' }}>
+                    <summary title="Reportes"><span class="nav-icon">▤</span><span class="nav-label">Reportes</span></summary>
+                    <div class="package-items"><a href="{{ route('reportes.index') }}" title="Reportes"><span class="nav-icon">▤</span><span class="nav-label">Generar reportes</span></a></div>
+                </details>
+            @elseif ($rolActual === 'Medico')
+                <span class="nav-group-title">Paquetes del sistema</span>
+                <details class="nav-package" open>
+                    <summary title="Citas"><span class="nav-icon">▦</span><span class="nav-label">Citas</span></summary>
+                    <div class="package-items"><a href="{{ route('citas.agenda') }}" title="Mi agenda y asistencia"><span class="nav-icon">▦</span><span class="nav-label">Mi agenda y asistencia</span></a></div>
+                </details>
+            @elseif ($rolActual === 'Paciente')
+                <span class="nav-group-title">Paquetes del sistema</span>
+                <details class="nav-package" {{ request()->routeIs('portal.perfil', 'portal.historial-medico') ? 'open' : '' }}>
+                    <summary title="Pacientes"><span class="nav-icon">♙</span><span class="nav-label">Pacientes</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('portal.perfil') }}" title="Mi perfil"><span class="nav-icon">♙</span><span class="nav-label">Mi perfil</span></a>
+                        <a href="{{ route('portal.historial-medico') }}" title="Mi historial médico"><span class="nav-icon">▤</span><span class="nav-label">Mi historial médico</span></a>
+                    </div>
+                </details>
+                <details class="nav-package" {{ request()->routeIs('citas.*', 'portal.citas') ? 'open' : '' }}>
+                    <summary title="Citas"><span class="nav-icon">▦</span><span class="nav-label">Citas</span></summary>
+                    <div class="package-items">
+                        <a href="{{ route('citas.disponibilidad') }}" title="Consultar disponibilidad"><span class="nav-icon">◷</span><span class="nav-label">Consultar disponibilidad</span></a>
+                        <a href="{{ route('portal.citas') }}" title="Mis citas"><span class="nav-icon">▦</span><span class="nav-label">Mis citas y cancelaciones</span></a>
+                    </div>
+                </details>
             @endif
         </nav>
         <div class="sidebar-bottom">
@@ -205,6 +282,7 @@
             </form>
         </div>
     </aside>
+    <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Cerrar menú"></button>
     <div class="main-area">
     <div class="topbar"><span><button class="mobile-menu" id="mobileMenu" type="button">Menú</button>Clínica Vida Salud</span><strong>{{ $rolActual }}</strong></div>
     <main>
@@ -223,11 +301,13 @@
             const body = document.body;
             const toggle = document.getElementById('sidebarToggle');
             const mobile = document.getElementById('mobileMenu');
+            const backdrop = document.getElementById('sidebarBackdrop');
             toggle?.addEventListener('click', () => {
                 if (window.matchMedia('(max-width: 760px)').matches) body.classList.toggle('sidebar-open');
                 else body.classList.toggle('sidebar-compact');
             });
             mobile?.addEventListener('click', () => body.classList.toggle('sidebar-open'));
+            backdrop?.addEventListener('click', () => body.classList.remove('sidebar-open'));
             document.querySelectorAll('input[data-weekdays-only]').forEach((input) => {
                 const validarDia = () => {
                     if (!input.value) return;
